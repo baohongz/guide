@@ -71,18 +71,21 @@ document.getElementById("mask").style.display = "block";
 </script>
 
 
-<script type="text/javascript" src="package/Nozzle/js/jquery-1.5.1.min.js"></script>
-<script type="text/javascript" src="package/Nozzle/js/jquery.tablesorter.js"></script>
-<script type="text/javascript" src="package/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+<script type="text/javascript" src="package/jquery.js"></script>
+<script type="text/javascript" src="package/jquery.tablesorter.min.js"></script>
 
 <script type="text/javascript" src="package/Nozzle/js/nozzle.js"></script>
 <script type="text/javascript" src="package/Nozzle/js/nozzleMeta.js"></script>
 <script type="text/javascript">
 	$(document).ready( function() {
 		initNozzle( "r100", $ );
-		$("a#single_image").fancybox();
 		toggleContents( $("[id^=result]"), false);
-});
+
+		$( "#menu_help_view" ).off("click");
+		$( "#menu_help_view" ).click( function() {
+			window.open("https://baohongz.github.io/guide/QAmiRSeq.html");
+		});
+	});
 </script>
 
 <div class="report" id="r100">
