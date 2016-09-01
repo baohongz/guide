@@ -2,13 +2,13 @@
 <!--
 ################################################################################
 #
-# Master HTML portal page
+# QAmiRSeq: User Guide
 #
 #
 # Baohong Zhang
 #
 #
-# July. 2015
+# July. 2016
 #
 #################################################################################
 -->
@@ -104,44 +104,25 @@ document.getElementById("mask").style.display = "block";
 <div class="sectionbody">
 <div class="code">
 <pre>
+<font color=red><b>!!! Do make sure all the following prerequisites are meet</b></font>
+
 The following open source should be downloaded and installed
-    1. download STAR from https://github.com/alexdobin/STAR/releases
-    2. install SUBREAD packages http://subread.sourceforge.net/
-    3. download JAR file from http://varscan.sourceforge.net/
-    4. download and install RSeQC from http://rseqc.sourceforge.net/
-    5. download and install samtools from http://sourceforge.net/projects/samtools/files/
 
-To set the following software related parameters in configuration file. samtools is assumed
-to be in your system path since it is a basic utility tool for NGS data analysis.
-        STAR_RNA=/hpc/grid/shared/ngsapp/STAR_2.4.0k/bin/Linux_x86_64
-        FEATURECOUNTS=/hpc/grid/shared/ngsapp/subread-1.4.6/bin
-        RSeQC=/afs/grid.pfizer.com/mm/proj01/app/python/bin
-        VARSCAN_JAR=/hpc/grid/shared/ngsapp/bin/VarScan.v2.4.0.jar
+	1. download bowtie from <a href=https://sourceforge.net/projects/bowtie-bio/files/bowtie/0.12.7>https://sourceforge.net/projects/bowtie-bio/files/bowtie/0.12.7/</a>
+	2. install cutadapt packages <a href=https://pypi.python.org/pypi/cutadapt>https://pypi.python.org/pypi/cutadapt</a>
 
-#
-## preparation geneome/annotation/index for RNA-seq data analysis
-#
-An example on how to create GRCh38_Gencode23 index for RNA-seq data analysis step by step
-  a. download genome Fastq ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_23/GRCh38.primary_assembly.genome.fa.gz
-  b. download gene annotation in GTF: ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_23/gencode.v23.annotation.gtf.gz
-  c. unzip and rename genome and GTF as: GRCh38.primary.genome.fa, GRCh38.gencode.v23.gtf and
-      put them in the corresponding project data folder
-  d.  prepare annotation and BED files using utility functions in QAmiRSeq
-      1).  gtf2bed.pl  GRCh38.gencode.v23.gtf >  GRCh38.gencode.v23.bed
-      2).  gtf2annot.pl GRCh38.gencode.v23.gtf > GRCh38.gencode.v23.annot
-      3).  samtools faidx GRCh38.primary.genome.fa
-  f.  create genome index as below:
-       /hpc/grid/shared/ngsapp/STAR_2.4.0k/bin/Linux_x86_64/STAR \
-          --runThreadN 32 --runMode genomeGenerate --genomeDir /hpc/grid/shared/ngsdb/STAR/GRCh38_gencode23_100 \
-          --genomeFastaFiles  /hpc/grid/shared/ngsdb/fasta/GRCh38.primary.genome.fa --sjdbGTFfile \
-          /hpc/grid/shared/ngsdb/annotation/gencode/GRCh38.gencode.v23.gtf --sjdbOverhang 99
-  g.  To set the following reference geneome related parameters in configuration file
-      GENOME_FASTA=/hpc/grid/shared/ngsdb/fasta/GRCh38.primary.genome.fa
-      GENOME_INDEX=/hpc/grid/shared/ngsdb/STAR/GRCh38_gencode23_100
-      GENOME_ANNOTATION=/hpc/grid/shared/ngsdb/annotation/gencode/GRCh38.gencode.v23.annot
-      GTF_FILE=/hpc/grid/shared/ngsdb/annotation/gencode/GRCh38.gencode.v23.gtf
-      BEDFILE=/hpc/grid/shared/ngsdb/annotation/gencode/GRCh38.gencode.v23.bed
-      CHR_REGION=chr6:1-170805979
+Then add the executables to your PATH !
+	
+Perl modules required to be installed:
+First, you can test whether these modules installed by using the following command lines
+	perl -e "use Config::Simple"
+	perl -e "use Parallel::ForkManager"
+	perl -e "use Compress::Zlib"
+	perl -e "use MIME::Base64"
+If you don't see any error message, you have them successfully installed. Otherwise, install them
+	
+R packages required to be installed:
+	reshape2, ggplot2, latticeExtra and scales
 </pre>
 </div>
 
@@ -149,156 +130,160 @@ An example on how to create GRCh38_Gencode23 index for RNA-seq data analysis ste
 </div> <!-- subsection -->
 
 <div class="subsection">
-<div class="sectionheader">Download QAmiRSeq package</div>
+<div class="sectionheader">Install QAmiRSeq package</div>
 <div class="sectionbody">
-
-<a href=https://sourceforge.net/projects/quickrnaseq>https://sourceforge.net/projects/quickrnaseq</a>
-
-</div>
-</div> <!-- subsection -->
-<div class="subsection">
-<div class="sectionheader">Prepare RNA-seq data</div>
-<div class="sectionbody">
-
 <div class="code">
 <pre>
-a. prepare a sample annotation file and sample ID file
-    1)  sample ID file, an unique ID per line. Assume the suffix of fastq files is fq.gz
-        and its corresponding fastq files are:
-            sample_id_1.fq.gz
-            sample_id_2.fq.gz.
-    2) sample annotation file:
-        column #1:  sample_id
-        column #2:  subject_id
-        column #3--#n (optional)
-        For clinical RNA-seq, samples from the same subject should be assigned to the same subject_id.
-	<font color=red>
-     	!!!NOTE!!!:
-        QAmiRSeq can be run without a sample annotation, but it is strongly recommended that
-        a user should provide meaningful annotations for all samples. A proper annotation file
-        should be tab delimited, and QAmiRSeq requires the first and second columns correspond
-        to sample and subject identifiers, respectively. A sample name should start with a letter,
-        and does not contain any white space in the middle
-	</font>
+You need to download and install QAmiRSeq from <a href=http://QAmiRSeq.sourceforge.net>http://QAmiRSeq.sourceforge.net</a>
 
-b. To set the following parameters in your configuration file
-    # directory for FASTQ files
-    FASTQ_DIR=/hpc/grid/ngsws/molmed/data/QAmiRSeq/fastq
-    # suffix for fastq files:  fq.gz or fastq.gz or fastq  or fq
-    FASTQ_SUFFIX=fq.gz
-    # stranded or nonstranded. #0: nonstranded;  1: forward strandness;  2: reverse strandness
-    STRAND=0
-    # sequencing type: pair or single
-    SEQUENCE_TYPE=pair
-    # sequencing depth #regular: 40-80M; #deep: >100M
-    SEQUENCE_DEPTH=regular
-    # COMPREHENSIVE_QC: true if performed; false if no individual sample QC
-    COMPREHENSIVE_QC=true
-    #log directory
-    LOGDIR=/hpc/grid/scratch/$USER/log
+#set environment variable to point to your installation directory
+<font color=red><b>export QAmiRSeq=QAmiRSeq_installation_Directory</b></font>
+
+#add QAmiRSeq to your system path
+<font color=red><b>export PATH=$QAmiRSeq:$PATH</b></font>
+
+#!!!
+# It is assumed you're using bash shell. if NOT, please adjust the command line accordingly.
+#  Especially, if you are using CSH, please set QAmiRSeq using
+#    setenv QAmiRSeq QAmiRSeq_installation_Directory
+#  Not  set QAmiRSeq QAmiRSeq_installation_Directory
+#!!!	
 </pre>
 </div>
-
 </div>
 </div> <!-- subsection -->
 
 <div class="subsection">
-<div class="sectionheader">Sample configuration file</div>
+<div class="sectionheader">Preparation of miRNA/hairpin/mRNA/smallRNA database</div>
 <div class="sectionbody">
-
 <div class="code">
 <pre>
-Note:
-    Please refer to star-fc-qc.config.template for more details
-    You can copy star-fc-qc.config.template in QAmiRSeq package to your
-    project folder and then customize it to your environment
-########################################################################
+After you download and unpack the QAmiRSeq package, you should go to $QAmiRSeq/database folder 
+and then run create_database_util.sh to create databases for human/mouse/rat. This step will
+take a couple of hours (between 2-4hr)
 
-#
-# RNA-seq project related information
-#
-FASTQ_DIR=/hpc/grid/ngsws/molmed/data/QAmiRSeq/fastq
-FASTQ_SUFFIX=fq.gz
-STRAND=0
-SEQUENCE_DEPTH=regular
-SEQUENCE_TYPE=pair
-COMPREHENSIVE_QC=true
-LOGDIR=/hpc/grid/scratch/$USER/log
-
-#
-## Species-specific GenomeIndex and GTF
-## Usually, you DON'T need to modify them unless a different geneome/annotation is used
-#
-GENOME_FASTA=/hpc/grid/shared/ngsdb/fasta/GRCh38.primary.genome.fa
-GENOME_INDEX=/hpc/grid/shared/ngsdb/STAR/GRCh38_gencode23_100
-GENOME_ANNOTATION=/hpc/grid/shared/ngsdb/annotation/gencode/GRCh38.gencode.v23.annot
-GTF_FILE=/hpc/grid/shared/ngsdb/annotation/gencode/GRCh38.gencode.v23.gtf
-BEDFILE=/hpc/grid/shared/ngsdb/annotation/gencode/GRCh38.gencode.v23.bed
-CHR_REGION=chr6:1-170805979
-
-#######################################################################
-#
-##Software specific parameters
-##Usually, you DON'T need to modify them unless you understand the 
-##impacts of these parameters
-#
-#######################################################################
-
-STAR_PARAMETER="--alignSJDBoverhangMin 1 $limitBAMsortRAM --outFilterMismatchNoverLmax 0.05 --outFilterScoreMinOverLread 0.90 --outFilterMatchNminOverLread 0.90 --alignIntronMax 1000000"
-FEATURECOUNTS_OVERLAP="--minReadOverlap 25"
-VARSCAN_PARAMETER="--min-coverage 20 --min-reads2 4"
-
-
-#
-##Software locations
-## Usually, you DON'T need to modify them unless you update packages
-#
-STAR_RNA=/hpc/grid/shared/ngsapp/STAR_2.4.0k/bin/Linux_x86_64
-FEATURECOUNTS=/hpc/grid/shared/ngsapp/subread-1.4.6/bin
-RSeQC=/afs/grid.pfizer.com/mm/proj01/app/python/bin
-VARSCAN_JAR=/hpc/grid/shared/ngsapp/bin/VarScan.v2.4.0.jar
+<font color=red><b>!!! Don't move ahead until your database creation is successfully done !!!</b></font>
+You are encouraged to customize create_database_util.sh  and create your own smallRNA
+and mRNA databases. 
 </pre>
 </div>
-
 </div>
 </div> <!-- subsection -->
 
 <div class="subsection">
-<div class="sectionheader">Process individual sample: mapping, counting and QC</div>
+<div class="sectionheader">Example of Run Configuration File</div>
 <div class="sectionbody">
 
 <div class="code">
 <pre>
-Note:
-    1. This step is computationally intensive
-    2. Under the project folder, there is a separate result folder for each sample
-########################################################################
+<font color=red><b>!!! Please modify settings based on your environment.</b></font>
+#
+### general run configuration file
+#
 
-    export QAmiRSeq={QAmiRSeq_installation_Directory}
-    export PATH=$QAmiRSeq:$PATH
-    star-fc-qc.sh allIDs.txt project_configuration_file
-    #run the following command if you run the analysis on a standalone workstation
-    #star-fc-qc.ws.sh allIDs.txt project_configuration_file
-<font color=red>
-    !!!NOTE!!!:
-    The out-of-box QAmiRSeq is fully tested in a HPC cluster using IBM Platform LSF
-    (Load Sharing Facility), a powerful workload management platform for demanding, distributed
-    HPC environments. IBM Platform LSF provides a comprehensive set of intelligent,
-    policy-driven scheduling features that enable you to utilize all of your compute
-    infrastructure resources and ensure optimal application performance. In addition to
-    LSF, there is a list of notable job scheduling software available. For a cluster
-    using a job scheduler other than LSF, star-fc-qc.sh (implementation of Step #1 in
-    Figure 1) needs to be twisted or modified.
-    For those people who have no access to a HPC cluster, we offer star-fc-qc.ws.sh, a 
-    customized script working in a standard Linux workstation. Of course, to analyze a
-    large RNA-seq dataset in a single workstation is not typical.
+# directory for FASTQ files
+FASTQ_DIR=./fastq
 
-    #run the following command if you don't perform comprehensive QC for individual sample
-    #star-fc.sh allIDs.txt project_configuration_file
-    #It's better to set COMPREHENSIVE_QC to false in your configuration file and call star-fc-qc.sh
+# suffix for fastq:  fq.gz or fastq.gz or fastq  or fq
+FASTQ_SUFFIX=fastq
 
-    #run the following command if you run the analysis on a standalone workstation
-    #star-fc-qc.ws.sh allIDs.txt project_configuration_file
+# target folder
+OUTPUT_FOLDER=output
+
+# stranded or nonstranded. #0: nonstranded;  1: forward strandness;  2: reverse strandness
+STRAND=1
+
+# the CPU cores, recommended 8 to 12 if multiple cores are available
+CPU=8
+
+# 5- and 3- end extension
+EXTENSION5=4
+EXTENSION3=5
+
+# for clean reads with adapter trimmed, set it to no.
+CUTADAPT_REQUIRED=yes
+
+# parameter for adapter cutting
+CUTADAPT_PARAMETER="-a TGGAATTCTCGGGTGCCAAGG -a AGATCGGAAGAGCACACGTCT -m 16" 
+
+# filter out reads with low abundance (optional strongly recommended)
+FILTER_NOISE_READS=yes
+
+# subtract reads mapped to miRNA with mismatches but have better hits in reference genome
+# (recommended, but optional)
+#!!!
+# If turn it on, be sure you have created bowtie index library for the reference genome.
+#!!!
+REFINE_MISMATACH_READS=no
+
+# run unique reads versus the library size analysis (optional, only recommended for comprehensive analysis)
+# The results are written into uniqReads.library.csv
+UNIQUE_LIBRARY_ANALYSIS=yes
+
+# The offset (5 and 3 end) analysis of mapped reads
+# If set to yes, it's better to change the 5' and 3' end extension to 4 and 5, respectively
+OFFSET_ANALYSIS=yes
+
+# run 5' and 3' end extension evaluation (optional,only recommended for comprehensive analysis)
+# To explore the impact of extension on miRNA read mapping
+# File extension.evaluation.csv record the number of mapped mirna reads
+RUN_EXTENSION_EVALUATION=no
+
+# keep intermediate files or not 
+keepTemp=yes
+
+#
+### filtering noise miRNA reads
+# 
+# A read is filtered out if 
+#    1)the % of samples having ZERO counts is above the threshold (a fraction)
+#    2)the number of samples having ZERO counts is above the threshold (an integer)
+#  AND
+##   The average read count across SAMPLES is below the cuttoff
+# recommended 0.60-0.80 (80%)
+
+# you can define the meaning of ZERO, not necessarily 0
+ZEROCOUNT_THRESHOLD=0
+ZEROCOUNT_SAMPLE_THRESHOLD=0.60
+AVG_READ_THRESHOLD=2
+
+#
+### Species-specific miRNA database
+#
+
+# sample source
+SPECIES=human
+
+# Bowtie index for miRNA, hairpin, smallRNA, and mRNA
+RNA_BOWTIE_INDEX=/hpc/grid/shared/ngsapp/QAmiRSeq/database/human/db_stranded_0
+
+#Bowtie index for reference genome
+GENOME_BOWTIE_INDEX=/hpc/grid/shared/ngsdb/bowtie/hg19
+
+# MINIMUM and MAXIMUM miRNA length,used to filter reads too short or too long when mapped to miRNA
+MIN_MIRNA_LENGTH=16
+MAX_MIRNA_LENGTH=28
+</pre>
+</div>
+</div>
+</div> <!-- subsection -->
+
+<div class="subsection">
+<div class="sectionheader">Reads mapping, counting and summary</div>
+<div class="sectionbody">
+<div class="code">
+<pre>
+Please refer to $QAmiRSeq/demo_run and see how to analyse your own dataset. 
+In essence, you need to prepare two files. 
+
+	1. allIDs.txt: containing the list of samples that you want to analyze
+	2. run.config: a control file in which you can instruct how the analysis is done
+
+There is run.config.template that comes with QAmiRSeq package. You can copy this template
+and then customize it.
+
+Run the pipeline:
+	perl  $QAmiRSeq/QAmiRSeq.pl  allIDs.txt run.config
 </font>
 </pre>
 </div>
@@ -307,43 +292,24 @@ Note:
 </div> <!-- subsection -->
 
 <div class="subsection">
-<div class="sectionheader">Merge results from individual samples and generate an integrated report</div>
+<div class="sectionheader">Generate an integrated report</div>
 <div class="sectionbody">
 
 <div class="code">
 <pre>
-Note:
-    1. Please run this command under the project folder.
-    2. If sample_annotation_file is not provided, a mock annotation will be generated.
-########################################################################
+Go to your output folder, and run a single command line
+	$QAmiRSeq/QAmiRSeq-report.sh
+	
+NOTE: TAB delimited sample.annotation.txt Annotation is optional but it is strongly recommended.
+      column #1:  sample_id
+      column #2:  subject_id
+      column #3--#n (optional)
+ For clinical miRNA-seq, samples from the same subject should be assigned to the same subject_id.
+ QAmiRSeq requires the first and second columns correspond to sample and subject identifiers, respectively.
+ A sample name should start with a letter, and does not contain any white space in the middle.
 
-    export GENOME_ANNOTATION=/hpc/grid/shared/ngsdb/annotation/gencode/GRCh38.gencode.v23.annot
-    star-fc-qc.summary.sh allIDs.txt sample_annotation_file[optional]
-    #bsub -app large "star-fc-qc.summary.sh allIDs.txt sample.annotation.txt &> Results.log"
-    #run the command linebelow if no individual sample QC or you run the analysis in a workstation
-    #star-fc.summary.sh allIDs.txt sample_annotation_file[optional]
-</pre>
-</div>
+All analysis are accessible from index.html
 
-</div>
-</div> <!-- subsection -->
-
-<div class="subsection">
-<div class="sectionheader">QAmiRSeq test run</div>
-<div class="sectionbody">
-
-<div class="code">
-<pre>
- Please refer to $QAmiRSeq/test_run folder for:
-      1.   allIDs.txt:  sample identifiers
-      2.   sample.annotation.txt: annotation file
-      3.  GTEx.config:  sample configuration file
-      4.  master-cmd.sh: command lines for test runs
-      Note: run step #1 after step #1 finishes
-            Adjust QAmiRSeq to point to QAmiRSeq installation folder
-     
- Please ALSO refer to $QAmiRSeq/star-fc-qc.config.template to create your own project
- specific configuration file.
 </pre>
 </div>
 
@@ -396,7 +362,7 @@ cut-adapter-SurvivalReads.png	:	barplot--The percentage of survival reads after 
 joint-unique-mapping.png	:	the cumulative number of unique and total reads
 miRNA-reads.png	:	barplot--total number of mapped miRNA reads in each sample
 miRNA-reads-split.png	:	barplot--miRNA reads split between perfect and mismatch
-miRNASeq-reads-annotation.png	:	barplot--distribution of annotated miRNA-seq reads
+miRNASeq-reads-annotation.png	:	barplot--distribution of annotated mimiRNA-seq reads
 miRNA-detected.png	:	barplot--detected miRNAs with and without filtering
 miRNA-counted.png	:	barplot--detected miRNAs after filtering
 miR-rpm-corr.png	:	Expression correlation plot among all samples
@@ -437,7 +403,7 @@ cut-adapter-withAdapter.png
 <div class="sectionheader">Explore integrated and interactive report</div>
 <div class="sectionbody">
 Open the index.html file under Results folder and you will have access to all data
-and figures, and drill down RNA-seq analysis results in an interactive way.
+and figures, and drill down miRNA-seq analysis results in an interactive way.
 <p>
 <div class="subsection" id="result2.1">
 <div class="sectionheader">Meaning of mouse icons</div>
@@ -536,7 +502,7 @@ Step 7: Move mouse up to the top of the canvas to activate the top menu, clicak 
 Step 1: Click on the "New repository" icon.<br>
 <img src=package/img/github1.png border=1 width=100%><br><br>
 
-Step 2: Type in project name such as RNASeq_1 and description and then click "Create repository" icon.<br>
+Step 2: Type in project name such as MyProject and description and then click "Create repository" icon.<br>
 <img src=package/img/github2.png border=1 width=100%><br><br>
 
 </div>
@@ -549,8 +515,8 @@ Text in <font color=red>red</font> need to be replaced by your own settings.
 <p>
 <div class="code">
 <pre>
- git clone https://github.com/<font color=red>username/RNASeq_1</font>.git
- cd <font color=red>RNASeq_1</font>
+ git clone https://github.com/<font color=red>username/MyProject</font>.git
+ cd <font color=red>MyProject</font>
  git checkout --orphan gh-pages
  cp -R <font color=red>path2result</font>/Results/* .
 
@@ -561,7 +527,7 @@ Text in <font color=red>red</font> need to be replaced by your own settings.
 </div>
 <br>
 <br>
-Now, the report is available at http://<font color=red>username</font>.github.io/<font color=red>RNASeq_1</font> .
+Now, the report is available at http://<font color=red>username</font>.github.io/<font color=red>MyProject</font> .
 
 </div>
 </div> <!-- subsection -->
