@@ -2,7 +2,7 @@
 <!--
 ################################################################################
 #
-# QAmiRSeq: User Guide
+# QuickMIRSeq: User Guide
 #
 #
 # Baohong Zhang
@@ -15,7 +15,7 @@
 
 <html>
 <head>
-<title>QAmiRSeq: User Guide</title>
+<title>QuickMIRSeq: User Guide</title>
 <link rel="stylesheet" type="text/css" href="package/Nozzle/css/nozzle.css" media="screen">
 <link rel="stylesheet" type="text/css" href="package/Nozzle/css/nozzle.print.css" media="print">
 <style type="text/css">
@@ -83,7 +83,7 @@ document.getElementById("mask").style.display = "block";
 
 		$( "#menu_help_view" ).off("click");
 		$( "#menu_help_view" ).click( function() {
-			window.open("https://baohongz.github.io/guide/QAmiRSeq.html");
+			window.open("https://baohongz.github.io/guide/QuickMIRSeq.html");
 		});
 	});
 </script>
@@ -92,11 +92,11 @@ document.getElementById("mask").style.display = "block";
 <div class="frame">
 <div class="main">
 
-<div class="title">QAmiRSeq: User Guide</div>
+<div class="title">QuickMIRSeq: User Guide</div>
 
 
 <div class="section">
-<div class="sectionheader">How to run QAmiRSeq pipeline from scratch</div>
+<div class="sectionheader">How to run QuickMIRSeq pipeline from scratch</div>
 <div class="sectionbody">
 
 <div class="subsection">
@@ -130,23 +130,23 @@ R packages required to be installed:
 </div> <!-- subsection -->
 
 <div class="subsection">
-<div class="sectionheader">Install QAmiRSeq package</div>
+<div class="sectionheader">Install QuickMIRSeq package</div>
 <div class="sectionbody">
 <div class="code">
 <pre>
-You need to download and install QAmiRSeq from <a href=http://QAmiRSeq.sourceforge.net>http://QAmiRSeq.sourceforge.net</a>
+You need to download and install QuickMIRSeq from <a href=http://QuickMIRSeq.sourceforge.net>http://QuickMIRSeq.sourceforge.net</a>
 
 #set environment variable to point to your installation directory
-<font color=red><b>export QAmiRSeq=QAmiRSeq_installation_Directory</b></font>
+<font color=red><b>export QuickMIRSeq=QuickMIRSeq_installation_Directory</b></font>
 
-#add QAmiRSeq to your system path
-<font color=red><b>export PATH=$QAmiRSeq:$PATH</b></font>
+#add QuickMIRSeq to your system path
+<font color=red><b>export PATH=$QuickMIRSeq:$PATH</b></font>
 
 #!!!
 # It is assumed you're using bash shell. if NOT, please adjust the command line accordingly.
-#  Especially, if you are using CSH, please set QAmiRSeq using
-#    setenv QAmiRSeq QAmiRSeq_installation_Directory
-#  Not  set QAmiRSeq QAmiRSeq_installation_Directory
+#  Especially, if you are using CSH, please set QuickMIRSeq using
+#    setenv QuickMIRSeq QuickMIRSeq_installation_Directory
+#  Not  set QuickMIRSeq QuickMIRSeq_installation_Directory
 #!!!	
 </pre>
 </div>
@@ -158,7 +158,7 @@ You need to download and install QAmiRSeq from <a href=http://QAmiRSeq.sourcefor
 <div class="sectionbody">
 <div class="code">
 <pre>
-After you download and unpack the QAmiRSeq package, you should go to $QAmiRSeq/database folder 
+After you download and unpack the QuickMIRSeq package, you should go to $QuickMIRSeq/database folder 
 and then run create_database_util.sh to create databases for human/mouse/rat. This step will
 take a couple of hours (between 2-4hr)
 
@@ -255,7 +255,7 @@ AVG_READ_THRESHOLD=2
 SPECIES=human
 
 # Bowtie index for miRNA, hairpin, smallRNA, and mRNA
-RNA_BOWTIE_INDEX=/hpc/grid/shared/ngsapp/QAmiRSeq/database/human/db_stranded_0
+RNA_BOWTIE_INDEX=/hpc/grid/shared/ngsapp/QuickMIRSeq/database/human/db_stranded_0
 
 #Bowtie index for reference genome
 GENOME_BOWTIE_INDEX=/hpc/grid/shared/ngsdb/bowtie/hg19
@@ -273,17 +273,17 @@ MAX_MIRNA_LENGTH=28
 <div class="sectionbody">
 <div class="code">
 <pre>
-Please refer to $QAmiRSeq/demo_run and see how to analyse your own dataset. 
+Please refer to $QuickMIRSeq/demo_run and see how to analyse your own dataset. 
 In essence, you need to prepare two files. 
 
 	1. allIDs.txt: containing the list of samples that you want to analyze
 	2. run.config: a control file in which you can instruct how the analysis is done
 
-There is run.config.template that comes with QAmiRSeq package. You can copy this template
+There is run.config.template that comes with QuickMIRSeq package. You can copy this template
 and then customize it.
 
 Run the pipeline:
-	perl  $QAmiRSeq/QAmiRSeq.pl  allIDs.txt run.config
+	perl  $QuickMIRSeq/QuickMIRSeq.pl  allIDs.txt run.config
 </font>
 </pre>
 </div>
@@ -298,14 +298,14 @@ Run the pipeline:
 <div class="code">
 <pre>
 Go to your output folder, and run a single command line
-	$QAmiRSeq/QAmiRSeq-report.sh
+	$QuickMIRSeq/QuickMIRSeq-report.sh
 	
 NOTE: TAB delimited sample.annotation.txt Annotation is optional but it is strongly recommended.
       column #1:  sample_id
       column #2:  subject_id
       column #3--#n (optional)
  For clinical miRNA-seq, samples from the same subject should be assigned to the same subject_id.
- QAmiRSeq requires the first and second columns correspond to sample and subject identifiers, respectively.
+ QuickMIRSeq requires the first and second columns correspond to sample and subject identifiers, respectively.
  A sample name should start with a letter, and does not contain any white space in the middle.
 
 All analysis are accessible from index.html
@@ -346,7 +346,7 @@ miR.filter.Counts.Mismatch.csv	:	miRNA mismatch read counts table with filtering
 miR.filter.RPM.csv	:	miRNA RPM table with filtering of noisy reads
 miR.RPM.csv	:	miRNA RPM table without filtering
 miRNASeq.readRedundancy.txt	:	Read redundancy in each annotated category
-QAmiRSeq.summary.txt	:	The summary of read mapping and annotation
+QuickMIRSeq.summary.txt	:	The summary of read mapping and annotation
 readAnnotDistribution.csv	:	The distribution of annotated reads
 readLenDistribution.csv	:	The distribution of read lengths
 smallRNA.Counts.csv :	smallRNA read counts table without filtering
